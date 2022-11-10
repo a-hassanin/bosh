@@ -1,26 +1,34 @@
 require 'common/retryable'
+require 'open3'
 require_relative './artifact'
 
 module Bosh::Dev
   class GnatsdManager
-    VERSION = '1.3.0-bosh.10'.freeze
-    DARWIN_SHA256 = 'fac87b6b9b46830551f32f22930a61e2162edf025304f0f2ce7282b4350003f7'.freeze
-    LINUX_SHA256 = 'e5362a7c88ed92d4f4263b1b725e901fe29da220c3548e37570793776b5f6d51'.freeze
-    BUCKET_NAME = 'bosh-gnatsd'.freeze
+    VERSION = 'latest'.freeze
 
     REPO_ROOT = File.expand_path('../../../../', File.dirname(__FILE__))
     INSTALL_DIR = File.join('tmp', 'gnatsd')
     EXECUTABLE_NAME = 'gnatsd'.freeze
 
-    INFO = Artifact::Info.new('gnatsd', VERSION, DARWIN_SHA256, LINUX_SHA256, BUCKET_NAME)
-    INSTALLER = Artifact::Installer.new(INFO, INSTALL_DIR, 'gnatsd')
-
     def self.install
-      INSTALLER.install
+      # just use bosh cli to sync blobs to get the latest nats package tarball for the current commit
+      _, status = Open3.capture2("cd #{REPO_ROOT}/..; bosh sync-blobs;")
+      raise 'error syncing bosh blobs' unless status.success?
+
+      _, status = Open3.capture2("tar \
+                                  -C #{REPO_ROOT}/#{INSTALL_DIR}/ \
+                                  -xzf #{REPO_ROOT}/../blobs/nats/nats-server*.tar.gz \
+                                  --wildcards nats-server-*/nats-server")
+      raise "error extracting nats binary to #{REPO_ROOT}/#{INSTALL_DIR}" unless status.success?
+
+      _, status = Open3.capture2("mv \
+                                 #{REPO_ROOT}/#{INSTALL_DIR}/nats-server-*/nats-server \
+                                 #{REPO_ROOT}/#{INSTALL_DIR}/#{EXECUTABLE_NAME}")
+      raise 'error moving nats binary' unless status.success?
     end
 
     def self.executable_path
-      INSTALLER.executable_path
+      "#{REPO_ROOT}/#{INSTALL_DIR}/#{EXECUTABLE_NAME}"
     end
   end
 end
