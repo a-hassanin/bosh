@@ -107,7 +107,6 @@ module Bosh
         end
 
         allocate_ips(ips)
-
         write_agent_settings(agent_id, {
             agent_id: agent_id,
             blobstore: @options['agent']['blobstore'],
@@ -503,6 +502,10 @@ module Bosh
 
       def write_agent_settings(agent_id, settings)
         FileUtils.mkdir_p(File.dirname(agent_settings_file(agent_id)))
+        if settings.dig(:env,'bosh','mbus','cert') 
+          settings[:env]['bosh']['mbus']['cert']['certificate'] = File.open("/home/kkiess/workspace/bosh/src/bosh-dev/assets/sandbox/nats_server/certs/director/certificate.pem").read
+          settings[:env]['bosh']['mbus']['cert']['private_key'] = File.open("/home/kkiess/workspace/bosh/src/bosh-dev/assets/sandbox/nats_server/certs/director/private_key").read
+        end
         File.write(agent_settings_file(agent_id), JSON.generate(settings))
       end
 

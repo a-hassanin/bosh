@@ -6,17 +6,10 @@ log_file: "<%= nats_log_path %>"
 authorization {
   users = [
     {
-      user: "C=USA, O=Cloud Foundry, CN=default.integration.test.bosh-internal,O=Cloud Foundry,C=USA"
-      permissions: {
-        publish: [ "agent.*" ]
-        subscribe: [ "director.>" ]
-      }
-    },
-    {
       user: "C=USA, O=Cloud Foundry, CN=default.director.bosh-internal"
       permissions: {
-        publish: [ "agent.*", "hm.director.alert" ]
-        subscribe: [ "director.>" ]
+        publish: [ "agent.>", "hm.director.alert", "hm.agent.heartbeat.>", "director.>" ]
+        subscribe: [ "director.>", "agent.>" ]
       }
     },
     {
