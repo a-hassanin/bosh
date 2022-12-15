@@ -86,6 +86,7 @@ module Bosh::Director
         @dns_encoder,
         @link_provider_intents,
       )
+      agenda.steps << DeploymentPlan::Steps::PermanentNatsCredentialsStep.new
 
       agenda
     end
