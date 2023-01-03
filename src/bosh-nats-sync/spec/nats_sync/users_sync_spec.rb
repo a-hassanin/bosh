@@ -81,7 +81,8 @@ module NATSSync
     "az":"z1",
     "ips":[],
     "vm_created_at":"2022-05-25T20:54:18Z",
-    "active":false
+    "active":false,
+    "permanent_nats_credentials": true
   },
   {
     "agent_id":"c5e7c705-459e-41c0-b640-db32d8dc6e71",
@@ -92,7 +93,8 @@ module NATSSync
     "az":"z1",
     "ips":[],
     "vm_created_at":"2022-05-25T20:54:18Z",
-    "active":false
+    "active":false,
+    "permanent_nats_credentials": true
   }
 ]'
     end
@@ -255,9 +257,9 @@ module NATSSync
           expect(data_hash['authorization']['users'])
             .to include(include('user' => hm_subject))
           expect(data_hash['authorization']['users'])
-            .to include(include('user' => format(bosh_vms_subject, 'fef068d8-bbdd-46ff-b4a5-bf0838f918d9.agent')))
+            .to include(include('user' => format(bosh_vms_subject, 'long-lived-fef068d8-bbdd-46ff-b4a5-bf0838f918d9.agent')))
           expect(data_hash['authorization']['users'])
-            .to include(include('user' => format(bosh_vms_subject, 'c5e7c705-459e-41c0-b640-db32d8dc6e71.agent')))
+            .to include(include('user' => format(bosh_vms_subject, 'long-lived-c5e7c705-459e-41c0-b640-db32d8dc6e71.agent')))
         end
 
         it 'should not write the wrong ids to the NATs configuration file in the given path' do
@@ -277,7 +279,19 @@ module NATSSync
 
         describe 'when there is a previous configuration file with the same users' do
           before do
-            write_config_file(%w[fef068d8-bbdd-46ff-b4a5-bf0838f918d9 c5e7c705-459e-41c0-b640-db32d8dc6e71])
+            vms =
+              [
+                {
+                  'permanent_nats_credentials' => true,
+                  'agent_id' => 'fef068d8-bbdd-46ff-b4a5-bf0838f918d9',
+                },
+                {
+                  'permanent_nats_credentials' => true,
+                  'agent_id' => 'c5e7c705-459e-41c0-b640-db32d8dc6e71',
+                },
+              ]
+
+            write_config_file(vms)
           end
 
           it 'should not restart the NATs process' do
@@ -288,7 +302,18 @@ module NATSSync
 
         describe 'when there is a previous configuration file with different users' do
           before do
-            write_config_file(%w[fef068d8-bbdd-46ff-b4a5-bf0838f918d9 209b96c8-e482-43c7-8f3e-04de9f93c535])
+            vms =
+              [
+                {
+                  'permanent_nats_credentials' => true,
+                  'agent_id' => 'fef068d8-bbdd-46ff-b4a5-bf0838f918d9',
+                },
+                {
+                  'permanent_nats_credentials' => true,
+                  'agent_id' => '209b96c8-e482-43c7-8f3e-04de9f93c535',
+                },
+              ]
+            write_config_file(vms)
           end
 
           it 'should restart the NATs process' do
@@ -331,9 +356,9 @@ module NATSSync
         end
       end
 
-      def write_config_file(vms_uuids)
+      def write_config_file(vms)
         File.open(nats_config_file_path, 'w') do |f|
-          f.write(JSON.unparse(NatsAuthConfig.new(vms_uuids, director_subject, hm_subject).create_config))
+          f.write(JSON.unparse(NatsAuthConfig.new(vms, director_subject, hm_subject).create_config))
         end
       end
     end

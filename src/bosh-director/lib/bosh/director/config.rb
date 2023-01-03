@@ -26,6 +26,7 @@ module Bosh::Director
         :dns,
         :dns_db,
         :enable_cpi_resize_disk,
+        :enable_short_lived_nats_credentials,
         :enable_post_deploy,
         :enable_snapshots,
         :enable_virtual_delete_vms,
