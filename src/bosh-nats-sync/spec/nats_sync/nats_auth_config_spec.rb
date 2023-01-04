@@ -7,11 +7,11 @@ module NATSSync
     let(:vms) do
       [
         {
-          'permanent_nats_credentials' => true,
+          'permanent_nats_credentials' => false,
           'agent_id' => 'fef068d8-bbdd-46ff-b4a5-bf0838f918d9',
         },
         {
-          'permanent_nats_credentials' => true,
+          'permanent_nats_credentials' => false,
           'agent_id' => 'c5e7c705-459e-41c0-b640-db32d8dc6e71',
         },
       ]
@@ -21,27 +21,39 @@ module NATSSync
 
     describe '#execute_nats_auth_config' do
       describe 'read config' do
-        it 'returns the vms belonging to the deployments' do
+        it 'returns the authentication configs belonging to the deployments' do
           created_config = subject.create_config
-          expect(created_config['authorization']['users'].length).to eq(4)
+          expect(created_config['authorization']['users'].length).to eq(6)
           expect(created_config['authorization']['users'][0]['user']).to eq(director_subject)
           expect(created_config['authorization']['users'][1]['user']).to eq(hm_subject)
           expect(created_config['authorization']['users'][2]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
+          expect(created_config['authorization']['users'][3]['user'])
             .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
+          expect(created_config['authorization']['users'][4]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[1]['agent_id']}.agent.bosh-internal")
+          expect(created_config['authorization']['users'][5]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[1]['agent_id']}.agent.bosh-internal")
         end
       end
       describe 'with no director or hm subjects' do
         let(:director_subject) { nil }
         let(:hm_subject) { nil }
 
-        it 'returns the vms belonging to the deployments' do
+        it 'returns the authentication configs excluding hm and director configs' do
           created_config = subject.create_config
-          expect(created_config['authorization']['users'].length).to eq(2)
+          expect(created_config['authorization']['users'].length).to eq(4)
           expect(created_config['authorization']['users'][0]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
+          expect(created_config['authorization']['users'][1]['user'])
             .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
+          expect(created_config['authorization']['users'][2]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[1]['agent_id']}.agent.bosh-internal")
+          expect(created_config['authorization']['users'][3]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[1]['agent_id']}.agent.bosh-internal")
         end
       end
-      describe 'when the vms do not have permanent nats credentials' do
+      describe 'when the vms have mixed values in the permanent_nats_credentials parameter' do
         let(:vms) do
           [
             {
@@ -55,7 +67,7 @@ module NATSSync
           ]
         end
 
-        it 'returns the pair of long lived and short lived credentials belonging to the vms in the deployments' do
+        it 'returns the short lived and long lived creds when false and only long lived when true' do
           created_config = subject.create_config
           expect(created_config['authorization']['users'].length).to eq(5)
           expect(created_config['authorization']['users'][0]['user']).to eq(director_subject)
