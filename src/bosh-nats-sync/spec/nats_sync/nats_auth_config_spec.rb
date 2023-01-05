@@ -53,31 +53,44 @@ module NATSSync
             .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[1]['agent_id']}.agent.bosh-internal")
         end
       end
-      describe 'when the vms have mixed values in the permanent_nats_credentials parameter' do
+
+      describe 'when the vm have permanent_nats_credentials parameter set to false' do
+        let(:vms) do
+          [
+            {
+              'permanent_nats_credentials' => false,
+              'agent_id' => 'fef068d8-bbdd-46ff-b4a5-bf0838f918d9',
+            },
+          ]
+        end
+
+        it 'should return the authentication configs for the short and long lived creds when false' do
+          created_config = subject.create_config
+
+          expect(created_config['authorization']['users'].length).to eq(4)
+          expect(created_config['authorization']['users'][2]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
+          expect(created_config['authorization']['users'][3]['user'])
+            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
+        end
+      end
+
+      describe 'when the vm have permanent_nats_credentials parameter set to true' do
         let(:vms) do
           [
             {
               'permanent_nats_credentials' => true,
               'agent_id' => 'fef068d8-bbdd-46ff-b4a5-bf0838f918d9',
             },
-            {
-              'permanent_nats_credentials' => false,
-              'agent_id' => 'c5e7c705-459e-41c0-b640-db32d8dc6e71',
-            },
           ]
         end
 
-        it 'returns the short lived and long lived creds when false and only long lived when true' do
+        it 'should return the authentication config for the long lived creds when true' do
           created_config = subject.create_config
-          expect(created_config['authorization']['users'].length).to eq(5)
-          expect(created_config['authorization']['users'][0]['user']).to eq(director_subject)
-          expect(created_config['authorization']['users'][1]['user']).to eq(hm_subject)
+
+          expect(created_config['authorization']['users'].length).to eq(3)
           expect(created_config['authorization']['users'][2]['user'])
             .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
-          expect(created_config['authorization']['users'][3]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[1]['agent_id']}.agent.bosh-internal")
-          expect(created_config['authorization']['users'][4]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[1]['agent_id']}.agent.bosh-internal")
         end
       end
     end
