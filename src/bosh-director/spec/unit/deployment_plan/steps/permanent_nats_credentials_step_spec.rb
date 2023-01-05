@@ -28,13 +28,13 @@ module Bosh::Director
             allow(vm).to receive(:update)
           end
 
-          it 'should generate a new certificate' do
+          it 'should generate a new certificate key pair' do
             expect(cert_generator).to receive(:generate_nats_client_certificate)
 
             step.perform(report)
           end
 
-          it 'should send the credentials through NATs call update_settings' do
+          it 'should send the credentials through the NATs call update_settings' do
             expect(agent_client).to receive(:update_settings).with('mbus' => {
               'cert' => {
                 'ca' => 'nats begin\nnats content\nnats end\n',

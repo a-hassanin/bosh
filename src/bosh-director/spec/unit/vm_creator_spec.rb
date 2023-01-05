@@ -235,7 +235,7 @@ module Bosh
             Config.enable_short_lived_nats_credentials = false
           end
 
-          it 'should add the permanent nats credentials steps' do
+          it 'should not add the permanent nats credentials steps' do
             expect(render_step).to receive(:perform).with(report).ordered
             expect(permanent_nats_credentials_step).to_not receive(:perform).with(report).ordered
 

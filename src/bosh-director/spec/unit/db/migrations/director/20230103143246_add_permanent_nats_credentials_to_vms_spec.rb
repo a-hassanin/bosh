@@ -34,7 +34,7 @@ module Bosh::Director
       DBSpecHelper.migrate(subject)
     end
 
-    it 'should adds permanent_nats_credentials to the vms table' do
+    it 'should add permanent_nats_credentials to the vms table' do
       expect(db[:vms].columns).to include(:permanent_nats_credentials)
     end
 
@@ -42,7 +42,7 @@ module Bosh::Director
       expect(db[:vms].where(id: 1).first[:permanent_nats_credentials]).to eq(false)
     end
 
-    it 'should add new vms records with permanent_nats_credentials equals false' do
+    it 'should add new vm records with permanent_nats_credentials equals false' do
       db[:instances] << {
         id: 2,
         job: 'fake-instance-group',
@@ -67,7 +67,7 @@ module Bosh::Director
       expect(db[:vms].where(id: 2).first[:permanent_nats_credentials]).to eq(false)
     end
 
-    it 'should add new vms records with permanent_nats_credentials equals true when specified.' do
+    it 'should add new vm records with permanent_nats_credentials equals true.' do
       db[:instances] << {
         id: 2,
         job: 'fake-instance-group',
