@@ -1,6 +1,6 @@
 module Bosh::Spec
   class Vm
-    attr_reader :last_known_state, :cid, :ips, :availability_zone, :instance_uuid, :job_name, :permanent_nats_credentials
+    attr_reader :last_known_state, :cid, :ips, :availability_zone, :instance_uuid, :job_name
 
     def initialize(
       waiter,
