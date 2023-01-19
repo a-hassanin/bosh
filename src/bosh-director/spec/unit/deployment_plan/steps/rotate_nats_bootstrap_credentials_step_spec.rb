@@ -3,7 +3,7 @@ require 'spec_helper'
 module Bosh::Director
   module DeploymentPlan
     module Steps
-      describe PermanentNatsCredentialsStep do
+      describe RotateNatsBootstrapCredentialsStep do
         subject(:step) { described_class.new }
 
         let(:instance) { Models::Instance.make }

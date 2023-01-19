@@ -118,7 +118,7 @@ module Bosh::Director
             env['bosh']['mbus']['cert'] ||= {}
             env['bosh']['mbus']['cert']['ca'] = Config.nats_server_ca
             cert_generator = NatsClientCertGenerator.new(@logger)
-            agent_short_lived_creds = cert_generator.generate_nats_client_certificate "#{agent_id}.agent.bosh-internal"
+            agent_short_lived_creds = cert_generator.generate_nats_client_certificate "bootstrap-#{agent_id}.agent.bosh-internal"
             env['bosh']['mbus']['cert']['certificate'] = agent_short_lived_creds[:cert].to_pem
             env['bosh']['mbus']['cert']['private_key'] = agent_short_lived_creds[:key].to_pem
 

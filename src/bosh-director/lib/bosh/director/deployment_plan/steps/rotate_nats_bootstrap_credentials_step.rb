@@ -1,9 +1,9 @@
 module Bosh::Director
   module DeploymentPlan
     module Steps
-      class PermanentNatsCredentialsStep
+      class RotateNatsBootstrapCredentialsStep
         def perform(report)
-          agent_permanent_creds = NatsClientCertGenerator.new(@logger).generate_nats_client_certificate "long-lived-#{report.vm.agent_id}.agent.bosh-internal"
+          agent_permanent_creds = NatsClientCertGenerator.new(@logger).generate_nats_client_certificate "#{report.vm.agent_id}.agent.bosh-internal"
           settings = {}
           settings['mbus'] = {
             'cert' => {

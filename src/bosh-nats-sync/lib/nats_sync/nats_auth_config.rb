@@ -49,9 +49,9 @@ module NATSSync
       @vms.each do |vm|
         agent_id = vm['agent_id']
         if !vm['permanent_nats_credentials']
-          @config['authorization']['users'] << agent_user(agent_id, agent_id)
+          @config['authorization']['users'] << agent_user(agent_id, 'bootstrap-' + agent_id)
         end
-        @config['authorization']['users'] << agent_user(agent_id, 'long-lived-' + agent_id)
+        @config['authorization']['users'] << agent_user(agent_id, agent_id)
       end
       @config
     end

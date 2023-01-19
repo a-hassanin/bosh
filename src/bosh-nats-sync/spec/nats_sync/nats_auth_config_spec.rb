@@ -27,13 +27,13 @@ module NATSSync
           expect(created_config['authorization']['users'][0]['user']).to eq(director_subject)
           expect(created_config['authorization']['users'][1]['user']).to eq(hm_subject)
           expect(created_config['authorization']['users'][2]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=bootstrap-#{vms[0]['agent_id']}.agent.bosh-internal")
           expect(created_config['authorization']['users'][3]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
           expect(created_config['authorization']['users'][4]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[1]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=bootstrap-#{vms[1]['agent_id']}.agent.bosh-internal")
           expect(created_config['authorization']['users'][5]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[1]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[1]['agent_id']}.agent.bosh-internal")
         end
       end
       describe 'with no director or hm subjects' do
@@ -44,13 +44,13 @@ module NATSSync
           created_config = subject.create_config
           expect(created_config['authorization']['users'].length).to eq(4)
           expect(created_config['authorization']['users'][0]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=bootstrap-#{vms[0]['agent_id']}.agent.bosh-internal")
           expect(created_config['authorization']['users'][1]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
           expect(created_config['authorization']['users'][2]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[1]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=bootstrap-#{vms[1]['agent_id']}.agent.bosh-internal")
           expect(created_config['authorization']['users'][3]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[1]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[1]['agent_id']}.agent.bosh-internal")
         end
       end
 
@@ -69,9 +69,9 @@ module NATSSync
 
           expect(created_config['authorization']['users'].length).to eq(4)
           expect(created_config['authorization']['users'][2]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=bootstrap-#{vms[0]['agent_id']}.agent.bosh-internal")
           expect(created_config['authorization']['users'][3]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
         end
       end
 
@@ -90,7 +90,7 @@ module NATSSync
 
           expect(created_config['authorization']['users'].length).to eq(3)
           expect(created_config['authorization']['users'][2]['user'])
-            .to eq("C=USA, O=Cloud Foundry, CN=long-lived-#{vms[0]['agent_id']}.agent.bosh-internal")
+            .to eq("C=USA, O=Cloud Foundry, CN=#{vms[0]['agent_id']}.agent.bosh-internal")
         end
       end
     end

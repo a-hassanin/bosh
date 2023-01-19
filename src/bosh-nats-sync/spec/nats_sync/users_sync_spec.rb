@@ -257,9 +257,9 @@ module NATSSync
           expect(data_hash['authorization']['users'])
             .to include(include('user' => hm_subject))
           expect(data_hash['authorization']['users'])
-            .to include(include('user' => format(bosh_vms_subject, 'long-lived-fef068d8-bbdd-46ff-b4a5-bf0838f918d9.agent')))
+            .to include(include('user' => format(bosh_vms_subject, 'fef068d8-bbdd-46ff-b4a5-bf0838f918d9.agent')))
           expect(data_hash['authorization']['users'])
-            .to include(include('user' => format(bosh_vms_subject, 'long-lived-c5e7c705-459e-41c0-b640-db32d8dc6e71.agent')))
+            .to include(include('user' => format(bosh_vms_subject, 'c5e7c705-459e-41c0-b640-db32d8dc6e71.agent')))
         end
 
         it 'should not write the wrong ids to the NATs configuration file in the given path' do
@@ -267,9 +267,9 @@ module NATSSync
           file = File.read(nats_config_file_path)
           data_hash = JSON.parse(file)
           expect(data_hash['authorization']['users'])
-            .not_to include(include('user' => format(bosh_vms_subject, '9cb7120d-d817-40f5-9410-d2b6f01ba746.agent')))
+            .not_to include(include('user' => format(bosh_vms_subject, 'bootstrap-9cb7120d-d817-40f5-9410-d2b6f01ba746.agent')))
           expect(data_hash['authorization']['users'])
-            .not_to include(include('user' => format(bosh_vms_subject, '209b96c8-e482-43c7-9f3e-04de9f93c535.agent')))
+            .not_to include(include('user' => format(bosh_vms_subject, 'bootstrap-209b96c8-e482-43c7-9f3e-04de9f93c535.agent')))
         end
 
         it 'should restart the nats process' do

@@ -88,7 +88,7 @@ module Bosh
       let(:mount_instance_disks_step) { instance_double(DeploymentPlan::Steps::MountInstanceDisksStep, perform: nil) }
       let(:commit_networks_step) { instance_double(DeploymentPlan::Steps::CommitInstanceNetworkSettingsStep, perform: nil) }
       let(:release_networks_step) { instance_double(DeploymentPlan::Steps::ReleaseObsoleteNetworksStep, perform: nil) }
-      let(:permanent_nats_credentials_step) { instance_double(DeploymentPlan::Steps::PermanentNatsCredentialsStep, perform: nil) }
+      let(:rotate_nats_bootstrap_credentials_step) { instance_double(DeploymentPlan::Steps::RotateNatsBootstrapCredentialsStep, perform: nil) }
 
       let!(:report) { DeploymentPlan::Stages::Report.new }
 
@@ -121,8 +121,8 @@ module Bosh
           .and_return(commit_networks_step)
         allow(DeploymentPlan::Steps::ReleaseObsoleteNetworksStep).to receive(:new)
           .with(ip_provider).and_return(release_networks_step)
-        allow(DeploymentPlan::Steps::PermanentNatsCredentialsStep).to receive(:new)
-          .and_return(permanent_nats_credentials_step)
+        allow(DeploymentPlan::Steps::RotateNatsBootstrapCredentialsStep).to receive(:new)
+          .and_return(rotate_nats_bootstrap_credentials_step)
       end
 
       describe '#create_for_instance_plan' do
@@ -217,27 +217,27 @@ module Bosh
           end
         end
 
-        context 'when enable_short_lived_nats_credentials is enabled' do
+        context 'when enable_short_lived_nats_bootstrap_credentials is enabled' do
           before do
-            Config.enable_short_lived_nats_credentials = true
+            Config.enable_short_lived_nats_bootstrap_credentials = true
           end
 
           it 'should add the permanent nats credentials steps' do
             expect(render_step).to receive(:perform).with(report).ordered
-            expect(permanent_nats_credentials_step).to receive(:perform).with(report).ordered
+            expect(rotate_nats_bootstrap_credentials_step).to receive(:perform).with(report).ordered
 
             vm_creator.create_for_instance_plan(instance_plan, ip_provider, ['fake-disk-cid'], tags)
           end
         end
 
-        context 'when enable_short_lived_nats_credentials is disabled' do
+        context 'when enable_short_lived_nats_bootstrap_credentials is disabled' do
           before do
-            Config.enable_short_lived_nats_credentials = false
+            Config.enable_short_lived_nats_bootstrap_credentials = false
           end
 
           it 'should not add the permanent nats credentials steps' do
             expect(render_step).to receive(:perform).with(report).ordered
-            expect(permanent_nats_credentials_step).to_not receive(:perform).with(report).ordered
+            expect(rotate_nats_bootstrap_credentials_step).to_not receive(:perform).with(report).ordered
 
             vm_creator.create_for_instance_plan(instance_plan, ip_provider, ['fake-disk-cid'], tags)
           end

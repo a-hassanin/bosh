@@ -86,8 +86,8 @@ module Bosh::Director
         @dns_encoder,
         @link_provider_intents,
       )
-      if Config.enable_short_lived_nats_credentials
-        agenda.steps << DeploymentPlan::Steps::PermanentNatsCredentialsStep.new
+      if Config.enable_short_lived_nats_bootstrap_credentials
+        agenda.steps << DeploymentPlan::Steps::RotateNatsBootstrapCredentialsStep.new
       end
 
       agenda
