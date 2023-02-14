@@ -212,7 +212,7 @@ module Bosh::Director
         @keep_unreachable_vms = config.fetch('keep_unreachable_vms', false)
         @enable_post_deploy = config.fetch('enable_post_deploy', true)
         @enable_nats_delivered_templates = config.fetch('enable_nats_delivered_templates', false)
-        @enable_short_lived_nats_bootstrap_credentials = config.fetch('enable_short_lived_nats_bootstrap_credentials', false)
+        @enable_short_lived_nats_bootstrap_credentials = config.fetch('enable_short_lived_nats_bootstrap_credentials', true)
         @enable_short_lived_nats_bootstrap_credentials_compilation_vms = config.fetch('enable_short_lived_nats_bootstrap_credentials_compilation_vms', false)
         @allow_errands_on_stopped_instances = config.fetch('allow_errands_on_stopped_instances', false)
         @generate_vm_passwords = config.fetch('generate_vm_passwords', false)

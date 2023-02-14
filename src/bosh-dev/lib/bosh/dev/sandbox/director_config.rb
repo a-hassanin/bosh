@@ -85,6 +85,8 @@ module Bosh::Dev::Sandbox
       @enable_cpi_resize_disk = attrs.fetch(:enable_cpi_resize_disk, false)
       @default_update_vm_strategy = attrs.fetch(:default_update_vm_strategy, nil)
       @enable_nats_delivered_templates = attrs.fetch(:enable_nats_delivered_templates, false)
+      @enable_short_lived_nats_bootstrap_credentials = attrs.fetch(:enable_short_lived_nats_bootstrap_credentials, false)
+      @enable_short_lived_nats_bootstrap_credentials_compilation_vms = attrs.fetch(:enable_short_lived_nats_bootstrap_credentials_compilation_vms, false)
       @generate_vm_passwords = attrs.fetch(:generate_vm_passwords, false)
       @remove_dev_tools = attrs.fetch(:remove_dev_tools, false)
       @director_ips = attrs.fetch(:director_ips, [])
