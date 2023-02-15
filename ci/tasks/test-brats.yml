@@ -19,7 +19,7 @@ inputs:
     optional: true
 
 run:
-  path: bosh-src/ci/tasks/test-brats.sh
+  path: time
 
 params:
   FOCUS_SPEC: ""

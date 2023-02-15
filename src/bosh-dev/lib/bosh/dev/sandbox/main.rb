@@ -339,7 +339,10 @@ module Bosh::Dev::Sandbox
       @enable_post_deploy = options.fetch(:enable_post_deploy, true)
       @enable_nats_delivered_templates = options.fetch(:enable_nats_delivered_templates, false)
       @enable_short_lived_nats_bootstrap_credentials = options.fetch(:enable_short_lived_nats_bootstrap_credentials, false)
-      @enable_short_lived_nats_bootstrap_credentials_compilation_vms = options.fetch(:enable_short_lived_nats_bootstrap_credentials_compilation_vms, false)
+      @enable_short_lived_nats_bootstrap_credentials_compilation_vms = options.fetch(
+        :enable_short_lived_nats_bootstrap_credentials_compilation_vms,
+        false,
+      )
       @enable_cpi_resize_disk = options.fetch(:enable_cpi_resize_disk, false)
       @default_update_vm_strategy = options.fetch(:default_update_vm_strategy, ENV['DEFAULT_UPDATE_VM_STRATEGY'])
       @generate_vm_passwords = options.fetch(:generate_vm_passwords, false)
