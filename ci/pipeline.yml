@@ -382,7 +382,7 @@ jobs:
         attempts: 2
         params:
           env_name: brats-ubuntu-bionic-((branch_name))
-          terraform_source: bosh-src/ci/brats
+          terraform_source: bosh-src/ci/brats/terraform
           vars:
             rds_mysql_username: ((brats-rds-mysql-external-db-user))
             rds_mysql_password: ((brats-rds-mysql-external-db-password))
@@ -459,7 +459,7 @@ jobs:
           get_params: { action: destroy }
           params:
             env_name: brats-ubuntu-bionic-((branch_name))
-            terraform_source: bosh-src/ci/brats
+            terraform_source: bosh-src/ci/brats/terraform
             vars:
               rds_mysql_username: ((brats-rds-mysql-external-db-user))
               rds_mysql_password: ((brats-rds-mysql-external-db-password))
@@ -588,7 +588,7 @@ jobs:
         attempts: 2
         params:
           env_name: brats-ubuntu-jammy-((branch_name))
-          terraform_source: bosh-src/ci/brats
+          terraform_source: bosh-src/ci/brats/terraform
           vars:
             rds_mysql_username: ((brats-rds-mysql-external-db-user))
             rds_mysql_password: ((brats-rds-mysql-external-db-password))
@@ -665,7 +665,7 @@ jobs:
           get_params: { action: destroy }
           params:
             env_name: brats-ubuntu-bjammyionic-((branch_name))
-            terraform_source: bosh-src/ci/brats
+            terraform_source: bosh-src/ci/brats/terraform
             vars:
               rds_mysql_username: ((brats-rds-mysql-external-db-user))
               rds_mysql_password: ((brats-rds-mysql-external-db-password))

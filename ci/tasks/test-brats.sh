@@ -12,6 +12,15 @@ else
   export BOSH_DEPLOYMENT_PATH="/usr/local/bosh-deployment"
 fi
 
+# REPLACE in start-bosh.sh
+bosh int ${BOSH_DEPLOYMENT_PATH}/bosh.yml -o <(echo "- type: replace
+  path: /disk_pools/0/disk_size
+  value: 250000
+") > /tmp/bosh-with-disk.yml
+
+mv /tmp/bosh-with-disk.yml ${BOSH_DEPLOYMENT_PATH}/bosh.yml
+# END Replace
+
 . start-bosh
 
 . /tmp/local-bosh/director/env
@@ -28,17 +37,9 @@ CANDIDATE_STEMCELL_TARBALL_PATH="$(realpath "${src_dir}"/stemcell/*.tgz)"
 export CANDIDATE_STEMCELL_TARBALL_PATH
 export BOSH_DNS_ADDON_OPS_FILE_PATH="${BOSH_DEPLOYMENT_PATH}/misc/dns-addon.yml"
 
-export OUTER_BOSH_ENV_PATH="/tmp/local-bosh/director/env"
-
-DOCKER_CERTS="$(bosh int /tmp/local-bosh/director/bosh-director.yml --path /instance_groups/0/properties/docker_cpi/docker/tls)"
-export DOCKER_CERTS
-DOCKER_HOST="$(bosh int /tmp/local-bosh/director/bosh-director.yml --path /instance_groups/name=bosh/properties/docker_cpi/docker/host)"
-export DOCKER_HOST
-
 bosh -n update-cloud-config \
-  "${BOSH_DEPLOYMENT_PATH}/docker/cloud-config.yml" \
-  -o "${src_dir}/bosh-src/ci/dockerfiles/docker-cpi/outer-cloud-config-ops.yml" \
-  -v network=director_network
+  "${BOSH_DEPLOYMENT_PATH}/warden/cloud-config.yml" \
+  -o "${src_dir}/bosh-src/ci/brats/inner-bosh/outer-cloud-config-ops.yml"
 
 bosh -n upload-stemcell $CANDIDATE_STEMCELL_TARBALL_PATH
 
