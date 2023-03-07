@@ -10,7 +10,7 @@ pushd ${BOSH_DEPLOYMENT_PATH} > /dev/null
   inner_bosh_dir="/tmp/inner-bosh/director/$node_number"
   mkdir -p ${inner_bosh_dir}
 
-  export BOSH_DIRECTOR_IP="10.245.0.$((10+$node_number))"
+  export BOSH_DIRECTOR_IP="10.244.0.$((10+$node_number))"
 
   bosh int bosh.yml \
     -o bosh-lite.yml \
@@ -55,5 +55,7 @@ EOF
   "${inner_bosh_dir}/bosh" -n update-cloud-config \
     "$script_dir/inner-bosh-cloud-config.yml" \
     -v node_number="${node_number}"
+
+  ip route add  10.245.${node_number}.0/24 via ${BOSH_DIRECTOR_IP}
 
 popd > /dev/null
