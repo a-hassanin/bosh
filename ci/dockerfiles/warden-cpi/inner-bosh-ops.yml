@@ -80,7 +80,7 @@
       mbus: nats://((internal_ip)):4222
     host_ip: ((internal_ip))
     warden:
-      connect_address: 127.0.0.1:7777
+      connect_address: ((garden_host)):7777
       connect_network: tcp
 
 - type: replace
