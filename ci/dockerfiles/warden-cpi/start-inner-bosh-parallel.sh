@@ -55,7 +55,5 @@ EOF
   "${inner_bosh_dir}/bosh" -n update-cloud-config \
     "$script_dir/inner-bosh-cloud-config.yml" \
     -v node_number="${node_number}"
-
-  ip route add  10.245.${node_number}.0/24 via ${BOSH_DIRECTOR_IP}
-
+    
 popd > /dev/null

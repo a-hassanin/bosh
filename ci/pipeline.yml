@@ -7,6 +7,7 @@ groups:
       - unit
       - unit-mysql
       - unit-postgres
+      - brats-ubuntu-jammy-warden
       - run-bundle-audit
       - integration-db-tls-postgres
       - integration-db-tls-postgres-hotswap
@@ -52,9 +53,124 @@ jobs:
       - unit-mysql
       - unit-postgres
       - run-bundle-audit
+      - brats-ubuntu-jammy-warden
     plan:
     - get: bosh-src
       trigger: true
+
+  - name: brats-ubuntu-jammy-warden
+    serial: true
+    plan:
+    - in_parallel:
+      - get: bosh-src
+      - get: bosh-dns-release
+      - get: stemcell
+        resource: warden-ubuntu-jammy
+      - get: bosh-candidate-release-tarballs
+      - get: bosh-release
+        resource: bosh-compiled-candidate-jammy
+      - get: bosh-deployment
+      - get: warden-cpi-docker-image
+      - get: integration-image
+    - do:
+      - put: brats-terraform
+        attempts: 2
+        params:
+          env_name: brats-ubuntu-jammy-((branch_name))
+          terraform_source: bosh-src/ci/brats
+          vars:
+            rds_mysql_username: ((brats-rds-mysql-external-db-user))
+            rds_mysql_password: ((brats-rds-mysql-external-db-password))
+            rds_mysql_databasename: ((brats-rds-mysql-external-db-name))
+            rds_postgres_username: ((brats-rds-postgres-external-db-user))
+            rds_postgres_password: ((brats-rds-postgres-external-db-password))
+            rds_postgres_databasename: ((brats-rds-postgres-external-db-name))
+            aws_access_key_id: ((bosh-ci-rds-terraform_aws_access_key.username))
+            aws_secret_access_key: ((bosh-ci-rds-terraform_aws_access_key.password))
+            gcp_mysql_databasename: ((brats-gcp-mysql-external-db-name))
+            gcp_postgres_databasename: ((brats-gcp-postgres-external-db-name))
+            gcp_private_network_name: brats-ubuntu-jammy-((branch_name))
+            concourse_authorized_network: ((concourse_egress_ip))
+          env:
+            GOOGLE_CREDENTIALS: ((cf-bosh-core_gcp-database-terraform_gcp_credentials_json))
+      - task: create-brats-sql-users
+        file: bosh-src/ci/tasks/create-brats-sql-users.yml
+        params:
+          GOOGLE_CREDENTIALS: ((cf-bosh-core_gcp-database-terraform_gcp_credentials_json))
+          GCP_POSTGRES_USERNAME: ((brats-gcp-postgres-external-db-user))
+          GCP_POSTGRES_PASSWORD: ((brats-gcp-postgres-external-db-password))
+          GCP_MYSQL_USERNAME: ((brats-gcp-mysql-external-db-user))
+          GCP_MYSQL_PASSWORD: ((brats-gcp-mysql-external-db-password))
+        input_mapping:
+          terraform-output: brats-terraform
+      - task: create-ssl-certificates
+        attempts: 2
+        file: bosh-src/ci/tasks/create-brats-ssl-certificates.yml
+        params:
+          GOOGLE_CREDENTIALS: ((cf-bosh-core_gcp-database-terraform_gcp_credentials_json))
+        input_mapping:
+          terraform-output: brats-terraform
+      - task: test-brats
+        image: warden-cpi-docker-image
+        file: bosh-src/ci/tasks/test-brats.yml
+        input_mapping:
+          database-metadata: brats-terraform
+        privileged: true
+        params: &brats-dbs-params
+          RDS_MYSQL_EXTERNAL_DB_USER: ((brats-rds-mysql-external-db-user))
+          RDS_MYSQL_EXTERNAL_DB_PASSWORD: ((brats-rds-mysql-external-db-password))
+          RDS_MYSQL_EXTERNAL_DB_NAME: ((brats-rds-mysql-external-db-name))
+          RDS_POSTGRES_EXTERNAL_DB_USER: ((brats-rds-postgres-external-db-user))
+          RDS_POSTGRES_EXTERNAL_DB_PASSWORD: ((brats-rds-postgres-external-db-password))
+          RDS_POSTGRES_EXTERNAL_DB_NAME: ((brats-rds-postgres-external-db-name))
+          GCP_MYSQL_EXTERNAL_DB_USER: ((brats-gcp-mysql-external-db-user))
+          GCP_MYSQL_EXTERNAL_DB_PASSWORD: ((brats-gcp-mysql-external-db-password))
+          GCP_MYSQL_EXTERNAL_DB_NAME: ((brats-gcp-mysql-external-db-name))
+          GCP_POSTGRES_EXTERNAL_DB_USER: ((brats-gcp-postgres-external-db-user))
+          GCP_POSTGRES_EXTERNAL_DB_PASSWORD: ((brats-gcp-postgres-external-db-password))
+          GCP_POSTGRES_EXTERNAL_DB_NAME: ((brats-gcp-postgres-external-db-name))
+          GCP_PRIVATE_NETWORK_NAME: brats-ubuntu-bionic-((branch_name))
+          STEMCELL_OS: ubuntu-jammy
+      ensure:
+        do:
+        - task: cleanup-external-dbs
+          file: bosh-src/ci/tasks/test-brats-db-cleanup.yml
+          image: integration-image
+          input_mapping:
+            database-metadata: brats-terraform
+          params: *brats-dbs-params
+        - task: destroy-brats-sql-users
+          file: bosh-src/ci/tasks/destroy-brats-sql-users.yml
+          params:
+            GOOGLE_CREDENTIALS: ((cf-bosh-core_gcp-database-terraform_gcp_credentials_json))
+            GCP_POSTGRES_USERNAME: ((brats-gcp-postgres-external-db-user))
+            GCP_POSTGRES_PASSWORD: ((brats-gcp-postgres-external-db-password))
+            GCP_MYSQL_USERNAME: ((brats-gcp-mysql-external-db-user))
+            GCP_MYSQL_PASSWORD: ((brats-gcp-mysql-external-db-password))
+          input_mapping:
+            terraform-output: brats-terraform
+        - put: brats-terraform
+          attempts: 3
+          get_params: { action: destroy }
+          params:
+            env_name: brats-ubuntu-bjammyionic-((branch_name))
+            terraform_source: bosh-src/ci/brats
+            vars:
+              rds_mysql_username: ((brats-rds-mysql-external-db-user))
+              rds_mysql_password: ((brats-rds-mysql-external-db-password))
+              rds_mysql_databasename: ((brats-rds-mysql-external-db-name))
+              rds_postgres_username: ((brats-rds-postgres-external-db-user))
+              rds_postgres_password: ((brats-rds-postgres-external-db-password))
+              rds_postgres_databasename: ((brats-rds-postgres-external-db-name))
+              aws_access_key_id: ((bosh-ci-rds-terraform_aws_access_key.username))
+              aws_secret_access_key: ((bosh-ci-rds-terraform_aws_access_key.password))
+              gcp_mysql_databasename: ((brats-gcp-mysql-external-db-name))
+              gcp_postgres_databasename: ((brats-gcp-postgres-external-db-name))
+              gcp_private_network_name: brats-ubuntu-jammy-((branch_name))
+              concourse_authorized_network: ((concourse_egress_ip))
+            env:
+              GOOGLE_CREDENTIALS: ((cf-bosh-core_gcp-database-terraform_gcp_credentials_json))
+            action: destroy
 
   - name: unit
     public: true
@@ -1424,7 +1540,7 @@ resources:
     type: git
     source:
       uri: git@github.com:cloudfoundry/bosh.git
-      branch: ((branch_name))
+      branch: wip_warden
       private_key: ((github_deploy_key_bosh.private_key))
 
   - name: bosh-src-dockerfiles
