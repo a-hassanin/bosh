@@ -6,10 +6,6 @@ script_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 src_dir="${script_dir}/../../../"
 node_number=${1}
 
-export OUTER_GARDEN_IP=$(ruby -rsocket -e 'puts Socket.ip_address_list
-                        .reject { |addr| !addr.ip? || addr.ipv4_loopback? || addr.ipv6? }
-                        .map { |addr| addr.ip_address }')
-
 pushd ${BOSH_DEPLOYMENT_PATH} > /dev/null
   inner_bosh_dir="/tmp/inner-bosh/director/$node_number"
   mkdir -p ${inner_bosh_dir}
@@ -28,7 +24,6 @@ pushd ${BOSH_DEPLOYMENT_PATH} > /dev/null
     -o "$script_dir/latest-bosh-release.yml" \
     -o "$script_dir/deployment-name.yml" \
     -v deployment_name="bosh-$node_number" \
-    -v garden_host="$OUTER_GARDEN_IP"
     ${@:2} > "${inner_bosh_dir}/bosh-director.yml"
 
   bosh -n deploy -d "bosh-$node_number" "${inner_bosh_dir}/bosh-director.yml" --vars-store="${inner_bosh_dir}/creds.yml"

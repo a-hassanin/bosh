@@ -48,5 +48,5 @@ EOF
   source "${local_bosh_dir}/env"
 
   bosh -n update-cloud-config warden/cloud-config.yml
-  ip route add 10.244.0.0/16 via ${BOSH_DIRECTOR_IP}
+  ip route add   10.244.0.0/16 via ${BOSH_DIRECTOR_IP}
 popd > /dev/null

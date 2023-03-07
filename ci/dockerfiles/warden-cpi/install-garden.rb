@@ -37,7 +37,7 @@ Dir.mktmpdir do |workspace|
         'default_container_grace_time': '0',
         'destroy_containers_on_start': true,
         'graph_cleanup_threshold_in_mb': '0',
-        'listen_address': '0.0.0.0:7777',
+        'listen_address': '127.0.0.1:7777',
         'listen_network': 'tcp',
       }
     }
